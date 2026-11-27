@@ -1,0 +1,427 @@
+================================================================================
+KOTHA STUDIO - FINAL CAPSTONE PROJECT
+WORKING TODO
+Prajwal Basnet - Gritfeat Solutions - Full Stack Web Development Internship
+Started 23 Nov 2026 | Proposal 25 Nov 2026 | Final submission 01 Dec 2026
+================================================================================
+
+PROJECT IN ONE LINE
+  Draw a 2D floor plan, calibrate the real scale, generate a true-dimension 3D
+  room, furnish it from a real catalogue, collaborate live, and order the
+  furniture - all in a monochrome, blueprint-inspired interface.
+
+DELIVERED SO FAR (23 Nov)
+  proposal/Kotha_Studio_Proposal.docx + .pdf        69-page master, 13 documents
+                                                    + 5 appendices, real TOC
+  proposal/Kotha_Studio_Proposal_Summary.docx/.pdf  6-page version of the whole
+                                                    proposal, one sheet per topic
+  proposal/README.txt                               package map + rebuild steps
+  proposal/FIGMA_HANDOFF.txt                        frames, wiring, components,
+                                                    tokens, state frames
+  proposal/assets/                                  9 diagrams + 10 wireframes
+                                                    + mobile trio + cover motif
+  Landing now carries: live instrument readout (X/Y/scale/grid/wall/height),
+  a STACK strip, an oversized outline word and a dimension tag that float at
+  0.3x scroll speed with a -3 degree lean.
+  Connected rooms: up to 3 spaces per plan; a doorway on a shared wall joins
+  two rooms and can be slid along its wall in 3D (W-06, US-13/14, T13/T14).
+
+LANDING PAGE - FRONTEND PASS (started 24 Nov, frontend only)
+  Goal: the public page has to sell the product before the product exists.
+  Monochrome ink-on-paper, nothing that reads as generic SaaS, motion tied
+  to scroll and never decorative for its own sake.
+  [x] Stack wired            React 19 + Vite 7 + TS + React Router 7
+  [x] Smooth scroll          Lenis singleton driven by GSAP ticker
+  [x] Hero loop              Bernoulli lemniscate, 14 hairline objects, load
+                             intro, bob, pointer readout, scroll scatter
+  [x] Hero layering          upper arc and its objects pass over the wordmark,
+                             lower arc and its objects sit behind a soft paper
+                             patch; objects dim for the instant they cross the
+                             loop centre so the z-switch is hidden
+  [x] Intro sheet            first-load title card: loop draws, wordmark sets,
+                             counter runs, sheet lifts; click / wheel / key
+                             skips; reduced motion bypasses it; the hero's own
+                             intro waits for the lift
+  [ ] Intro rework (planned) icons rise as a vertical trail, settle into the
+                             infinity loop, then "Kotha" zooms in with fade;
+                             target: complete by 01 Dec milestone
+  [x] Wordmark               Instrument Serif "Kotha" + tracked STUDIO rule
+  [x] CraftText              per-character ink rise + outline ghost lift,
+                             used on every chapter heading; spaces now sit
+                             between words, not inside nowrap spans
+  [x] Nav                    fixed, sticky paper blur, section observer,
+                             "Sign in" / "Open a plan" -> waitlist dialog
+  [x] Waitlist dialog        local-only capture with honest copy (API later)
+  [x] Register strip         marquee of real sheet specs under the hero
+  [x] Ch.01 Blueprint        A-01 plan sheet drops in folded along the wall,
+                             opens like a page, ink plots top-to-bottom,
+                             labels settle; pinned on desktop, inline mobile
+  [x] Ch.02 Room             R3F room builds on scroll: slab, walls, window,
+                             door, furniture; camera pushes in; % readout;
+                             camera steps back on narrow stages; R3F is
+                             lazy-loaded so the landing does not ship Three
+                             in the first paint
+  [x] Ch.03 Collection       7 real-footprint cards, group filter, one piece
+                             marked "does not fit" with a struck reason
+  [x] Ch.04 Studio           two cursors, pinned comment, version readout
+  [x] Ch.05 Order            invoice with stamp, paisa totals, lookup note
+  [x] Closing + footer       honest closed-beta copy, contact, specimen block
+  [x] Frame overlays         fixed grain, edge lens tied to scroll velocity,
+                             chapter progress rail
+  [x] Reduced motion         no Lenis loop, no marquee, static hero, room at
+                             100%, text visible
+  [x] 404                    "This drawing was never filed."
+  [ ] Auth pages             sign in / register / verify / reset deferred to
+                             the next frontend pass; buttons open the waitlist
+  [ ] Furniture cut-outs     source 6-10 transparent/white-background pieces,
+                             drop into /public, swap orbit + collection art
+  [ ] Visual QA              1440 / 1024 / 390 screenshots, fix collisions,
+                             verify pinned sections after font load
+                             pass 1 done: intro, hero layering, blueprint draw,
+                             room build, collection, studio, order, closing
+                             checked at 1440x900 and 390x844
+  [ ] Copy check             read every chapter aloud, cut anything that sounds
+                             like a brochure (keep real decisions + tradeoffs)
+
+DECISIONS LOCKED
+  [x] Frontend      React 19 + Vite 7 + TypeScript (NOT Next.js, NOT TanStack Start)
+  [x] Routing       React Router 7
+  [x] State         Redux Toolkit + RTK Query (one state solution)
+  [x] Styling       Tailwind CSS 4 + own component library
+  [x] 3D            three + @react-three/fiber + drei
+  [x] Motion        GSAP + CSS transitions (no second animation library)
+  [x] Forms         React Hook Form + Zod (shared rules with the API)
+  [x] Charts        Recharts
+  [x] Backend       Node 22 + Express 4 + TypeScript
+  [x] Database      MongoDB Atlas + Mongoose 8 (+ mongodb-memory-server for tests)
+  [x] Auth          JWT access (15 min) + rotating refresh (7 days, httpOnly cookie)
+  [x] Files         Multer (memory) -> Cloudinary
+  [x] Email         Nodemailer + Gmail SMTP (Mailtrap fallback)
+  [x] Payments      Khalti ePayment sandbox (initiate -> callback -> lookup)
+  [x] Realtime      Socket.IO, one room per project
+  [x] Docs          Swagger (OpenAPI 3) + README
+  [x] Tests         Jest + Supertest + React Testing Library
+  [x] Deploy        Vercel (client) + Render (API) + Atlas (DB)
+  [x] Roles         Client / Designer / Admin
+  [x] Collections   users, projects, designs, furniture, categories, orders,
+                    reviews, notifications (8)
+  [x] Design        black/white only, outline geometry, dust particles,
+                    one typeface, morph transitions (cube -> room -> sofa)
+  [x] Connected     up to 3 rooms per plan; a doorway on a shared wall joins
+      rooms         two rooms; doors/windows can be slid along their wall in 3D
+  [x] Motion refs   React Bits backgrounds studied and rewritten in monochrome
+                    (Dot Field lens, Dot Grid, Ripple Grid, Grid Scan, Topography,
+                    Threads, Silk, Dither halftone finishes, Grainient, Magnet
+                    Lines, Scanner, Grid Distortion). No new npm dependency.
+
+================================================================================
+PHASE 1 - PROPOSAL PACKAGE (target: submit 25 Nov, before 01 Dec milestone)
+================================================================================
+  [x] Read the brief and task file
+  [x] Research Khalti sandbox API contract
+  [x] Extract profile details from portfolio and CV
+  [x] Build the SVG diagram engine
+  [x] Draw architecture / use-case / ER / auth / component / pipeline /
+      deployment / Git / design-plate figures
+  [ ] Fix diagram text placement
+        - ER relationship labels and title overlap
+        - use-case ellipse labels (fixed, re-check)
+        - pipeline title/subtitle order and spacing
+        - deployment column overlap (rewrite)
+        - auth sequence order (register -> verify -> login -> refresh)
+        - Git branch dots on the curve, version tag position
+  [ ] Wireframes: 12 key screens, light blueprint style
+        1  Landing / hero (dust + morph sequence)
+        2  Login / register
+        3  Email verification + reset password
+        4  Client dashboard (projects + progress)
+        5  Blueprint editor (grid, walls, doors, windows, scale calibration)
+        6  Generated 3D room viewer
+        7  Customisation panel (furniture, materials, dimensions, cost)
+        8  Furniture catalogue (search, filter, sort, pagination)
+        9  Furniture detail (dimensions, model preview, add to room)
+        10 Cart and Khalti checkout
+        11 Orders and order status
+        12 Designer dashboard (templates, live sessions, analytics)
+        13 Admin dashboard (users, catalogue, orders, moderation, charts)
+        14 Notifications drawer + review modal
+        15 Mobile trio (landing, editor, catalogue)
+  [ ] Figma handoff pack
+        - frame-by-frame spec with sizes and states
+        - prototype flow list (which frame links where)
+        - component inventory and variants
+        - colour tokens, type scale, spacing, motion timings
+  [ ] DOCX engine
+        - A4, 25 mm margins, Arial only (regular/bold), no colour
+        - cover page, declaration, static TOC with dot leaders
+        - running header, page numbers, section breaks
+        - table style (black header, hairline borders), figure captions
+  [ ] Write the 13 required documents + appendices
+        1  Project proposal (problem, users, goals, scope, out of scope,
+           success criteria, risks, candidate background)
+        2  Requirements: 20 user stories with acceptance criteria + NFRs
+        3  Roles, permission matrix, use-case diagram, main flows
+        4  System architecture diagram and layer descriptions
+        5  Database design: 8 collections, field tables, embed vs reference,
+           indexes, ER diagram, integrity rules
+        6  API specification: every endpoint, auth, body, response, errors;
+           Socket.IO event table; Khalti flow
+        7  UI/UX: design language, tokens, typography, wireframes, mobile,
+           motion spec, accessibility, Figma prototype plan
+        8  Component tree, route map, protected routes, state plan, hooks
+        9  Tech stack with one-line justification each, Git workflow
+        10 Security plan: token lifecycle, RBAC, validation, upload, payment,
+           rate limits, secrets, OWASP mapping
+        11 Project plan: 4 sprints, estimates, milestones to 07 Dec
+        12 Testing plan: 22 test cases, sample code, manual checklist, CI
+        13 Deployment plan: hosts, env var names, CI, rollback, test accounts
+        A  Criterion-to-feature matrix (all 13 criteria)
+        B  Topic coverage matrix (all 20 rows)
+        C  Evaluation marks mapping
+  [ ] Two-pass table of contents with real page numbers
+  [ ] Render PDF and QA every page visually
+  [ ] Mentor pre-review, then submit
+
+PROPOSAL DEFENCE PREP
+  [ ] 10-minute talk: problem -> demo vision -> architecture -> DB -> security
+      -> plan -> risks
+  [ ] 20-minute Q&A drill: why Vite, why Khalti, why embed vs reference,
+      how refresh rotation works, how 3D stays accurate, what is out of scope
+  [ ] Keep the Figma prototype open during the defence
+
+================================================================================
+PHASE 2 - BUILD (after mentor approval, 26 Nov - 30 Nov)
+================================================================================
+SPRINT 0 - SETUP (26 Nov, half day)
+  [ ] Monorepo: /client, /server, /docs; npm workspaces optional
+  [ ] ESLint + Prettier + TypeScript strict
+  [ ] .env.example, .gitignore, README skeleton
+  [ ] GitHub repo, protected main/develop, first PR
+  [ ] GitHub Actions: install, lint, typecheck, test
+  [ ] Atlas cluster + database user + network access
+  [ ] Cloudinary account + unsigned preset or signed upload
+  [ ] Khalti sandbox merchant + keys
+  [ ] Render + Vercel projects connected
+
+SPRINT 1 - IDENTITY & CONTENT (27-29 Nov)
+  [ ] User model, bcrypt hashing, roles
+  [ ] Register, login, logout, refresh, me
+  [ ] Email verification (signed token) + resend
+  [ ] Forgot / reset password (single-use, 15 min)
+  [ ] Access token + rotating refresh cookie, revocation
+  [ ] Auth middleware, role middleware, ownership guards
+  [ ] Zod schemas + validation middleware + central error handler
+  [ ] Helmet, CORS allowlist, rate limits, sanitisation
+  [ ] Project CRUD (owner/designer/admin rules)
+  [ ] Blueprint editor: grid, wall drawing, doors/windows, presets
+  [ ] Scale calibration (two points + real length)
+  [ ] Trace-over: upload plan image, opacity slider, lock
+  [ ] Furniture + category CRUD (admin)
+  [ ] Catalogue: server search, filter, sort, pagination + indexes
+  [ ] Image upload to Cloudinary (type/size limits)
+  [ ] Client shell: layouts, protected routes, component library
+
+SPRINT 2 - THE 3D ROOM (30 Nov - 03 Dec)
+  [ ] Blueprint JSON schema (walls, openings, scale, room type)
+  [ ] Polygon closure + validation (Zod + geometry checks)
+  [ ] Geometry builder: floor shape, wall segments, openings
+  [ ] R3F scene: outline materials, dust particles, orbit + top view
+  [ ] Dimension labels, area, perimeter
+  [ ] Furniture placement: raycast drag, 10 cm snap, rotate, delete
+  [ ] Collision + bounds validation (OBB footprints)
+  [ ] Customisation: wall colour (monochrome range), floor patterns
+  [ ] Design versions: save, list, restore, thumbnail snapshot
+  [ ] Undo / redo history (Redux)
+  [ ] Morph transition cube -> room -> sofa (GSAP + R3F)
+  [ ] Reduced-motion fallback
+  [ ] Socket.IO: JWT handshake, project rooms, presence
+  [ ] Broadcast add/move/rotate/delete + save events
+  [ ] Live comments and in-app notifications
+  [ ] Nodemailer templates: verify, reset, design shared, order paid
+  [ ] Notification list, unread count, mark as read
+  [ ] Designer dashboard: shared projects, templates, activity
+
+SPRINT 3 - COMMERCE, INSIGHT, HARDENING (04-05 Dec)
+  [ ] Cart (client state + server price check)
+  [ ] Order creation with atomic stock decrement
+  [ ] Khalti initiate: amount in paisa, unique purchase_order_id
+  [ ] Return URL page -> server lookup -> verify Completed only
+  [ ] Order state machine: pending -> paid -> failed/expired/cancelled
+  [ ] Idempotent callback handling, re-verify before fulfilment
+  [ ] Failure and cancellation UI paths
+  [ ] Reviews (one per user per target) + moderation
+  [ ] Aggregation: revenue/month, top furniture, projects by room type,
+      revenue by category, order funnel, designer leaderboard
+  [ ] Recharts: 4 admin charts + 3 designer charts
+  [ ] Swagger annotations + /api/docs
+  [ ] Security review: headers, CORS, rate limits, sanitisation, upload,
+      cookie flags, token rotation, secrets audit
+  [ ] Query performance: explain() on 4 key queries, document results
+  [ ] 22 automated tests (see Phase 3)
+  [ ] Seed script: 3 users per role, 8 projects, 24 furniture, 6 orders
+
+SPRINT 4 - SHIP (06 Dec)
+  [ ] Deploy client (Vercel) and API (Render), connect Atlas + Cloudinary
+  [ ] Khalti return URL points to production
+  [ ] Smoke test every role in production
+  [ ] Test accounts for Client / Designer / Admin
+  [ ] README: setup, env list, screenshots, architecture, scripts
+  [ ] Postman collection export or Swagger link
+  [ ] Test report (run output + coverage)
+  [ ] Final report 5-8 pages + topic coverage list
+  [ ] 5-minute demo recording (scripted, clean audio)
+  [ ] Mentor sign-off
+
+================================================================================
+PHASE 3 - SUBMISSION CHECKLIST (07 Dec)
+================================================================================
+  [ ] Live frontend URL
+  [ ] Live backend URL + /api/docs
+  [ ] Test accounts for every role
+  [ ] GitHub repo with README
+  [ ] Updated design documents matching the build
+  [ ] Postman collection or Swagger
+  [ ] Test report
+  [ ] Final report (5-8 pages)
+  [ ] 5-minute demo recording
+  [ ] Mentor sign-off
+  [ ] Submit before 23:59
+
+================================================================================
+PROJECT CRITERIA - TICK AS BUILT
+================================================================================
+  [ ] 2+ roles .................................. Client, Designer, Admin
+  [ ] 5+ collections ............................ 8
+  [ ] 15+ user stories .......................... 20
+  [ ] Register / login / logout ................. yes
+  [ ] Forgot / reset password ................... yes
+  [ ] Email verification ........................ yes
+  [ ] Access + refresh tokens ................... 15 min / 7 days, rotated
+  [ ] Passwords hashed .......................... bcrypt, 12 rounds
+  [ ] RBAC in API ............................... middleware + ownership
+  [ ] RBAC in UI ................................ protected + role routes
+  [ ] CRUD + validation, 3+ entities ............ projects, furniture, designs,
+                                                  reviews (client + server)
+  [ ] Server search / filter / sort / pagination  catalogue + projects
+  [ ] Indexes ................................... text + compound, explain()
+  [ ] File upload ............................... blueprint image, covers, GLB
+  [ ] Email: verify, reset + 2 events ........... design shared, order paid
+  [ ] In-app notifications ...................... list, unread, mark read
+  [ ] Payment ................................... Khalti sandbox, order record,
+                                                  lookup verification, failure path
+  [ ] Real-time ................................. Socket.IO, room per project
+  [ ] 3+ dashboard charts ....................... 4 admin + 3 designer
+  [ ] Third-party integration ................... Khalti + Cloudinary
+  [ ] Security .................................. helmet, CORS, rate limit,
+                                                  sanitisation, env secrets
+  [ ] 15+ automated tests ....................... 22
+  [ ] README + API docs ......................... yes
+  [ ] Deployment + test accounts ................ yes
+
+TOPIC COVERAGE - WHERE IT LIVES
+  [ ] Components, props ......................... /client/src/components
+  [ ] useState, useEffect, useRef, useMemo ...... BlueprintEditor, RoomViewer
+  [ ] Custom hook ............................... useDesignHistory, useSocket
+  [ ] Routing, nested, protected ................ router + guards
+  [ ] Global state .............................. Redux Toolkit slices
+  [ ] Forms, loading, error states .............. RHF + Zod + RTK Query states
+  [ ] Optimistic UI / debounced search ........... furniture placement + search
+  [ ] Responsive reusable component library ...... /components/ui
+  [ ] REST MVC .................................. routers / controllers / services
+  [ ] JWT, bcrypt, refresh, role middleware ...... /server/src/auth
+  [ ] Validation, errors, logging ................ Zod + error handler + pino
+  [ ] Upload, email, env config .................. /services/upload, mailer, config
+  [ ] Security headers etc ....................... app.ts middleware chain
+  [ ] Mongoose schemas, refs vs embed ............ /models
+  [ ] Indexes + explain .......................... indexes.md + query notes
+  [ ] Aggregation pipelines ...................... /services/analytics
+  [ ] Transactions / atomic operators ............ order stock + payment state
+  [ ] Unit + integration tests ................... /server/tests, /client/tests
+  [ ] API documentation .......................... Swagger
+  [ ] Git branches, deployment, CI ............... GitHub + Actions + Vercel/Render
+
+================================================================================
+TEST LIST (22)
+================================================================================
+API - auth
+  [ ] register validates and hashes password
+  [ ] duplicate email rejected
+  [ ] login rejects wrong password
+  [ ] refresh rotates and revokes old token
+  [ ] expired/invalid access token rejected
+  [ ] email verification token works once
+  [ ] reset token works once and expires
+API - authorization
+  [ ] client cannot read another client's project
+  [ ] client cannot hit admin furniture endpoints
+  [ ] designer cannot delete a project they do not own
+API - projects / designs
+  [ ] project validation rejects unclosed polygon
+  [ ] design save rejects out-of-bounds furniture
+  [ ] version restore returns the saved snapshot
+API - catalogue
+  [ ] search + filter + sort + pagination envelope
+  [ ] text index used (explain plan assertion)
+API - orders / payment
+  [ ] order total recalculated server-side
+  [ ] Khalti initiate builds paisa amount + return_url
+  [ ] lookup Pending does not fulfil the order
+  [ ] lookup Completed fulfils exactly once (idempotent)
+API - analytics / notifications
+  [ ] revenue aggregation returns six months
+  [ ] notification unread count and mark-as-read
+UI
+  [ ] ProtectedRoute redirects unauthenticated user
+  [ ] furniture card renders dimensions and price
+  [ ] design history undo/redo reducer
+  [ ] debounced search calls the API once
+UNIT
+  [ ] polygon area + perimeter
+  [ ] OBB overlap detection
+
+================================================================================
+INFO / ACCOUNTS NEEDED
+================================================================================
+  [ ] College / university name and program (cover page)
+  [ ] Mentor name at Gritfeat
+  [ ] Khalti sandbox public key + secret key
+  [ ] Cloudinary cloud name + API key + secret
+  [ ] Gmail app password (or Mailtrap credentials)
+  [ ] MongoDB Atlas connection string
+  [ ] Figma file for the clickable prototype (intern assembles)
+  [ ] GitHub repo URL
+
+================================================================================
+RISKS AND CONTROLS
+================================================================================
+  3D scope creep        -> one scene template, 2 puzzle-free mechanics, data-driven
+  Khalti signup delay   -> sandbox-only code path + documented fallback
+  Time (14 days)        -> proposal early, 4 sprints, daily commit, no gold-plating
+  WebGL performance     -> cap 60 items, outline materials, no shadows, LOD off
+  Cookie/CORS issues    -> same-site=none + secure in prod, explicit allowlist
+  Atlas cold start      -> keep-alive ping, loading states
+  Lost work             -> push daily, feature branches, tags
+  Demo failure          -> seeded data, recorded backup demo
+
+================================================================================
+DAILY PLAN
+================================================================================
+  Mon 23 Nov  Proposal v1 generated (docx + diagrams + wireframes), review
+  Tue 24 Nov  Revise, Figma frames, mentor pre-review, defence outline
+  Wed 25 Nov  Submit proposal package, start setup tasks
+  Thu 26 Nov  Sprint 0 + auth foundation
+  Fri 27 Nov  Auth complete, projects, blueprint editor start
+  Sat 28 Nov  Blueprint editor, catalogue, uploads
+  Sun 29 Nov  Catalogue search + admin CRUD, component library
+  Mon 30 Nov  Geometry + R3F scene
+  Tue 01 Dec  Placement + dimensions + versions
+  Wed 02 Dec  Socket.IO co-op + comments + notifications
+  Thu 03 Dec  Emails + designer dashboard + polish
+  Fri 04 Dec  Orders + Khalti + reviews
+  Sat 05 Dec  Aggregation + charts + Swagger + tests + security
+  Sun 06 Dec  Deploy + README + reports + demo recording
+  Mon 07 Dec  Final checks + submit
+
+================================================================================
+END OF TODO
+================================================================================

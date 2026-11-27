@@ -1,0 +1,39 @@
+# dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# builds
+dist/
+build/
+*.tsbuildinfo
+
+# env / secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# tests / tooling
+coverage/
+.vite/
+.cache/
+tmp/
+uploads/
+
+# editors / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# local scratch
+*.local.*
+Kotha_Studio_Project_Proposal (copy 1).docx

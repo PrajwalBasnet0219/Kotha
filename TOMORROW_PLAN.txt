@@ -1,0 +1,134 @@
+KOTHA STUDIO - TOMORROW PLAN
+============================
+Date: 26 Nov 2026
+Owner: Prajwal Basnet
+Supervisor: Abiral Khadka
+Company: Gritfeat Solution
+
+1. AUTH (login / signup) - MAKE IT WORK
+--------------------------------------
+[x] Scaffolded: AuthProvider, SignIn, SignUp, Google dialog, role guards (client/designer/admin)
+[ ] Wire to real API when backend is ready (JWT + refresh cookie)
+[ ] Keep 3 roles: client, designer, admin
+[ ] Good design already in place (split sheet, demo accounts, theme toggle)
+[ ] Admin accounts are issued by Gritfeat (not self-serve)
+
+2. BLUEPRINT EDITOR - FOCUS AREA (replace market/catalogue emphasis)
+-------------------------------------------------------------------
+The product sells the BLUEPRINT and a PREVIEW of how the room/building/house looks.
+It does NOT sell furniture. The catalogue is a reference aid only.
+
+Editor must support:
+  - Blank sheet or upload a photo of an existing plan
+  - 100 mm grid with 15 degree rotation snapping
+  - Two-point scale calibration (one real distance -> whole sheet in mm)
+  - Wall runs: draw, extend, trim, join (min length enforced)
+  - Doors: place and slide along a wall; swing direction
+  - Windows: place and slide along a wall; sill height
+  - Room labels + auto area / perimeter
+  - Dimensions: show on demand, never hidden behind hover
+  - Up to 3 rooms joined by doorways on shared walls
+  - Undo / redo, layers (walls, openings, furniture, dimensions)
+  - Export: PDF + SVG plan, furniture schedule CSV, version snapshot
+
+Accuracy rules (a blueprint must be buildable):
+  - Walls must form closed rooms before a room is created
+  - Openings (door/window) must sit on a wall and not overlap another opening
+  - Door/window width must fit the wall with clearance at both ends
+  - Wall thickness and height are set once and applied everywhere
+  - Dimensions are always in millimetres, never rounded for display
+  - A plan that does not close cannot generate a 3D room (show why)
+
+Object placement validity (no invalid objects outside the box):
+  - A piece of furniture must be placed inside a room boundary
+  - A piece cannot straddle two rooms unless explicitly joined
+  - Clearance rules are enforced (e.g. 600 mm in front of a door)
+  - A piece that does not fit is never offered as a valid placement
+  - Show the reason a piece is invalid (too wide, blocks a door, outside room)
+  - Example: kitchen with 2 rooms -> a sofa placed outside those rooms is invalid
+
+3. 3D ROOM - CUSTOMISABLE (preview only)
+----------------------------------------
+  - Generated from the same millimetre values as the plan
+  - Orbit, pan, zoom
+  - Windows and doors are created here from the plan openings
+  - Everything except walls and floor can be moved: doors, windows, furniture
+  - Footprint and clearance warnings shown live while moving
+  - No selling, no cart, no checkout, no Khalti
+  - Export preview image / walkthrough of the room
+
+4. ADMIN PAGE - OVERSEE AND ADD PRODUCTS
+----------------------------------------
+[x] Scaffolded: overview, products, categories, projects, people
+  - Admin adds/edits furniture products (reference catalogue, with real dimensions)
+  - Admin oversees projects, comments, users, roles, activity
+  - Catalogue is shared: one product added once is seen by every project
+
+5. DARK MODE
+------------
+[x] Scaffolded with crafted hatch-sheet transition
+  - Reduced-motion fallback is instant
+  - AA contrast for both themes
+
+6. INTRO
+--------
+[x] Rewritten: infinity trail of specimens -> accelerate -> landing reveal
+[x] No "Kotha" wordmark in intro; hero shows it after reveal
+
+7. WHAT WE ARE NOT DOING
+------------------------
+  - No furniture sales, cart, checkout, payments, invoices, delivery
+  - No AR/VR, no auto furniture recognition from photos
+  - No structural/electrical/plumbing calculations
+
+8. NOTES
+--------
+9. BLUEPRINT SUMMARY PANEL (top right of the sheet)
+--------------------------------------------------
+  - Always visible summary card anchored to the top right of the blueprint
+  - Lists the construction materials needed to build what is drawn:
+      * Cement (bags), sand (m3), aggregate (m3), steel (kg)
+      * Bricks/blocks (count), timber (m), plywood (sheets)
+      * Paint (litres), primer, waterproofing
+      * Doors and windows (count by size)
+      * Plumbing/electrical points (count)
+  - Quantities are estimated from the traced walls, floors, and openings
+  - Recalculates live as the plan changes
+  - Exported with the plan (PDF/SVG) and as a material schedule CSV
+  - Clearly marked as an estimate, not a quote
+
+10. MULTI-FLOOR BLUEPRINTS
+--------------------------
+  - A project can have 1 or many floors (ground, 1st, 2nd, ...)
+  - Each floor is its own plan sheet with its own walls, openings, rooms
+  - Floors share a common grid and scale (calibrated once per project)
+  - Staircase/void openings link floors where they meet
+  - Add, remove, or reorder floors at any time
+  - A floor can be edited later to add rooms, walls, or openings
+  - 3D room/building preview shows all floors stacked
+  - Export per floor or the whole building
+  - Floor count and labels appear in the project header and the summary panel
+
+11. HERO PAGE - "KOTHA" WORDMARK EFFECT
+---------------------------------------
+  - Use React Bits "Shatter Type" component: https://pro.reactbits.dev/docs/components/shatter-type
+  - Apply ONLY to the word "Kotha" in the hero (not Studio, not other text)
+  - Trigger on hover or on intro reveal; keep it subtle and monochrome
+  - Respect reduced-motion: disable shatter, show static wordmark
+  - Must not affect layout or the hero loop layering (upper arc over, lower arc under)
+
+  - Keep frontend-only this round; backend untouched
+  - Update TODO.txt and the status PDF when scope changes
+  - Proposal deadline: 01 Dec 2026
+  - Proposal file: Kotha_Studio_Project_Proposal.pdf (9 pages, clickable TOC)
+
+12. NEW TASKS (added)
+---------------------
+  - Dark mode: hero "Kotha" shows a white circle artifact; remove/fix it.
+  - Hero "Kotha": implement the Shatter Type animation from the linked React Bits component.
+  - Blueprint editor: left-click-drag to highlight/select area; make every object draggable.
+  - 3D room: objects movable AND the whole room can be rotated/orbited smoothly.
+  - Theme toggle: replace current transition with a smooth whole-screen black/white blueprint sweep.
+  - Auth: add a secure admin login flow (JWT + refresh cookie, role guards, no demo accounts).
+  - Proposal timeline: extend the Gantt/timeline to at least 11 December 2026.
+  - Color: allow choosing colors for walls and floors in the blueprint editor.

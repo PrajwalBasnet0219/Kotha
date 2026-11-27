@@ -1,0 +1,176 @@
+KOTHA STUDIO — FIGMA HANDOFF
+Clickable prototype of the main flow · monochrome · one typeface
+Assemble from the wireframes in assets/ (wf_*.png). Every frame below already
+exists as a PNG; import at 2x, or rebuild with the component inventory.
+
+================================================================================
+01  FILE SETUP
+================================================================================
+  Page 1  "Foundations"   colour styles, text styles, spacing, components
+  Page 2  "Desktop"       F-01 … F-13, each 1440 x 1024
+  Page 3  "Mobile"        M-01 … M-03, each 390 x 844
+  Page 4  "States"        loading, empty, error, uncalibrated, collaborator present
+  Page 5  "Flow"          the prototype arrows, nothing else
+
+  Grid: 12 columns, 24 px gutter, 96 px margin, max width 1440.
+  Editor frames are full-bleed: 56 px tool rail, 300 px inspector.
+  Radius: 2 px controls, 3 px cards. No shadows anywhere.
+
+================================================================================
+02  COLOUR STYLES  (name them exactly like this)
+================================================================================
+  ink/0        #000000    hero background, primary buttons, table headers
+  ink/1        #0B0B0B    3D viewport in dark mode
+  ink/2        #1A1A1A    body text
+  ink/3        #333333    secondary text, icons
+  ink/4        #555555    captions, metadata
+  ink/5        #8A8A8A    disabled, placeholders, figure labels
+  ink/6        #BFBFBF    hairline borders, grid lines
+  ink/7        #E6E6E6    dividers, table rules
+  wash         #F5F5F5    panel backgrounds, callouts
+  paper        #FFFFFF    page background, card fill
+
+  No other colour exists in the file. State is weight and texture:
+  success = solid rule · warning = dotted rule · error = dashed rule + sentence.
+
+================================================================================
+03  TEXT STYLES  (Geist, fallback Helvetica Neue / Arial)
+================================================================================
+  display      56 / 1.05   600   -0.02em
+  h1           32 / 1.15   600   -0.01em
+  h2           24 / 1.20   600    0
+  h3           18 / 1.30   600    0
+  body         15 / 1.55   400    0
+  small        13 / 1.45   400    0
+  micro        11 / 1.30   500    0.12em   UPPERCASE
+  numeric      15 / 1.40   500    0        tabular figures (dimensions, prices)
+
+================================================================================
+04  COMPONENT INVENTORY  (name = the React component name)
+================================================================================
+  Button          variants: primary, secondary, ghost, disabled · states: default,
+                  hover, focus, loading (label swaps for a spinner, width holds)
+  Field           variants: default, focus, error, disabled · label above, hint
+                  below, error text linked to the field
+  Select          closed, open, selected
+  Checkbox        unchecked, checked, indeterminate
+  Chip            default, active (black fill, white text)
+  Card/Project    thumbnail, name, meta, progress rule
+  Card/Product    image, name, dimensions (numeric), price, Add button
+  Table           header row (black), body row, hover row, skeleton row
+  Pagination      first, middle, last, disabled
+  Drawer          closed, open (right, 360 px)
+  Modal           small (420), medium (560)
+  Toast           info, success, error · max three stacked
+  EmptyState      icon-less: title, one sentence, one action
+  Skeleton        line, card, chart
+  DimensionTag    mm and m variants, tabular figures
+  ChartCard       title, chart area, table fallback
+  SelectionHalo   four corner handles, 8 px squares, 1 px ink stroke
+  GhostOpening    dashed rectangle, 4 3 dash, ink/6
+
+================================================================================
+05  FRAMES AND PROTOTYPE WIRING
+================================================================================
+  F-01  Landing            1440x1024   wf_landing
+        "Start a room"            -> F-02   (smart animate, 240 ms, ease out)
+        "See a demo"              -> F-05   (opens the seeded room)
+        Include: the live instrument readout under the buttons (X, Y, scale,
+        grid, wall, height), the STACK strip along the foot, the oversized
+        outline word "ROOM" behind the hero, and the floating "4.20 m" tag.
+        Annotate the float rule: outline word and tag drift at 0.3x scroll
+        speed with a -3 degree lean; static under reduced motion.
+  F-02  Register           1440x1024   wf_auth
+        "Create account"          -> F-03   (after the verified state)
+        "Log in" link             -> F-02b  (login variant of the same card)
+  F-03  Dashboard          1440x1024   wf_dashboard
+        "New room"                -> F-04
+        project card              -> F-04
+        bell icon                 -> Drawer/Notifications (overlay)
+  F-04  Blueprint editor   1440x1024   wf_blueprint
+        "Generate 3D"             -> F-05   (dissolve 240 ms; the scan sweep is
+                                             described in the motion note below)
+        "Calibrate / Apply"       -> F-04b  (same frame, dimensions updated)
+        tool rail                 -> F-04c  (wall tool active variant)
+  F-05  3D room            1440x1024   wf_room3d
+        click the door            -> F-06
+        "Add furniture"           -> F-07
+        "Save and order"          -> F-09
+        "Share live session"      -> Modal/Share (overlay)
+  F-06  Direct edit        1440x1024   wf_door
+        "Save version"            -> F-05   (toast: "Version 4 saved")
+        "Remove opening"          -> F-06b  (warning variant: kitchen unreachable)
+        "Swap hinge"              -> F-06c  (swing arc flipped)
+  F-07  Catalogue          1440x1024   wf_catalogue
+        product card              -> F-08
+        filter checkbox           -> F-07b  (filtered result count changes)
+        page 2                    -> F-07c
+  F-08  Product detail     1440x1024   (build from Card/Product + DimensionTag)
+        "Add to room"             -> F-05   (toast: "Linen sofa added")
+        "Write a review"          -> Modal/Review
+  F-09  Checkout           1440x1024   wf_checkout
+        "Pay with Khalti"         -> F-10   (external link frame, sandbox)
+  F-10  Khalti return      1440x1024   (build: status line + spinner)
+        lookup Completed          -> F-11
+        lookup Pending/canceled   -> F-09   (toast: "Payment not completed")
+  F-11  Order / invoice    1440x1024   (build from Table + DimensionTag)
+        "Back to rooms"           -> F-03
+  F-12  Admin overview     1440x1024   wf_admin
+        sidebar "Orders"          -> F-13
+  F-13  Admin orders       1440x1024   (build from Table)
+        row click                 -> F-11   (admin view of the same order)
+
+  Designer flow (secondary, still clickable):
+  F-03 -> sidebar "Studio" -> wf_designer -> shared project row -> F-05
+  (presence bar shows two avatars; a comment pin sits on the door)
+
+================================================================================
+06  MOBILE FRAMES
+================================================================================
+  M-01  Landing            390x844    wf_mobile (left phone)
+        "Start a room"            -> M-02
+  M-02  Blueprint editor   390x844    wf_mobile (middle phone)
+        "Generate 3D"             -> M-03
+        bottom sheet handle       -> Sheet/Inspector (overlay, 60% height)
+  M-03  Catalogue          390x844    wf_mobile (right phone)
+        filter icon               -> Drawer/Filters (overlay, full height)
+        product card              -> M-04 (product detail, one column)
+
+================================================================================
+07  STATE FRAMES TO INCLUDE  (the brief asks for key screens, not just happy paths)
+================================================================================
+  S-01  Catalogue loading        skeleton cards, search disabled
+  S-02  Catalogue no results     EmptyState: "Nothing matches. Clear filters?"
+  S-03  Blueprint unclosed       dashed open endpoints + one sentence naming them
+  S-04  Blueprint uncalibrated   "Not calibrated" badge, ordering disabled
+  S-05  Room generating          three drifting lines, no spinner
+  S-06  Room with collaborator   presence bar, ghost outline on the moved item
+  S-07  Door removed             validation panel lists the unreachable kitchen
+  S-08  Checkout price changed   PriceChangeNotice with old and new totals
+  S-09  Payment failed           plain sentence + "Try again" (same order id)
+  S-10  Reduced motion           identical layout, no grain cycle, no lens
+
+================================================================================
+08  MOTION NOTE FOR THE PROTOTYPE
+================================================================================
+  Figma cannot run shaders, so annotate rather than fake:
+    - page transitions: smart animate, 240 ms, cubic-bezier(.22,1,.36,1)
+    - drawers and modals: 200 ms, ease out
+    - F-04 -> F-05: add a note "a single scan beam sweeps the room as it resolves
+      (Grid Scan technique, 900 ms, once)"
+    - F-05 -> F-06: note "selection halo 140 ms; dust lifts toward the selection"
+    - global: note "film grain 3.5% at 8 fps; lens at the viewport edges follows
+      scroll velocity; both disabled under prefers-reduced-motion"
+  The real behaviour is specified in Section 7.4 of the proposal, including the
+  React Bits reference table and the monochrome adaptation of each technique.
+
+================================================================================
+09  EXPORT AND SUBMISSION
+================================================================================
+  [ ] Prototype flow tested end to end: register -> plan -> room -> door edit ->
+      catalogue -> checkout -> return -> order -> admin.
+  [ ] Share link set to "Anyone with the link can view".
+  [ ] Paste the link into Section 7.10 of the proposal and into README.txt.
+  [ ] Export F-01, F-04, F-05, F-06, F-09 as PNG at 2x into assets/figma/ for the
+      submission folder (the brief accepts PDF plus Figma or image links).
+  [ ] Keep the file name: "Kotha Studio — Capstone Prototype".
