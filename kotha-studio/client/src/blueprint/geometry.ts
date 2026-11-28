@@ -15,6 +15,13 @@ export const OPENING_CLEARANCE = 100;
 export const DOOR_CLEARANCE = 600;
 export const DEFAULT_WALL_THICKNESS = 120;
 
+/** Finish defaults. The editor lets a floor override either colour. */
+export const DEFAULT_WALL_COLOR = '#e8e4da';
+export const DEFAULT_FLOOR_COLOR = '#d9d4c9';
+
+export const WALL_SWATCHES = ['#e8e4da', '#d9d4c9', '#b9b2a3', '#8a8172', '#6f685c', '#2f2f2b'];
+export const FLOOR_SWATCHES = ['#d9d4c9', '#cfc7b7', '#c4b8a3', '#b1a68f', '#9c8f78', '#e6e2d8'];
+
 export const snap = (value: number, step = GRID) => Math.round(value / step) * step;
 export const snapPt = (p: Pt): Pt => ({ x: snap(p.x), y: snap(p.y) });
 

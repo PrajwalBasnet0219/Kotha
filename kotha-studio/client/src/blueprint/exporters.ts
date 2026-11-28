@@ -50,14 +50,15 @@ export function planSvg(doc: BlueprintDoc, floor: Floor): string {
   for (const room of floor.rooms) {
     const c = polygonCentroid(room.points);
     const area = Math.abs(polygonArea(room.points)) / 1_000_000;
-    parts.push(`<polygon points="${room.points.map((p) => `${p.x},${p.y}`).join(' ')}" fill="#111111" fill-opacity="0.04" stroke="none"/>`);
+    parts.push(`<polygon points="${room.points.map((p) => `${p.x},${p.y}`).join(' ')}" fill="${room.kind === 'stair' ? '#b9b2a3' : (floor.floorColor ?? '#d9d4c9')}" fill-opacity="0.45" stroke="none"/>`);
     parts.push(`<text x="${c.x}" y="${c.y - 80}" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="180" font-weight="bold" fill="#111111">${escapeXml(room.name)}</text>`);
     parts.push(`<text x="${c.x}" y="${c.y + 160}" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="130" fill="#555555">${area.toFixed(2)} m²</text>`);
   }
 
   for (const wall of floor.walls) {
     for (const [a, b] of segmentsForWall(floor, wall)) {
-      parts.push(`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#111111" stroke-width="${wall.thickness}" stroke-linecap="butt"/>`);
+      parts.push(`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${floor.wallColor ?? '#111111'}" stroke-width="${wall.thickness}" stroke-linecap="butt"/>`);
+      parts.push(`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#111111" stroke-opacity="0.22" stroke-width="8" stroke-linecap="round"/>`);
     }
   }
 

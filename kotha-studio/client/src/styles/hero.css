@@ -145,6 +145,34 @@
   white-space: nowrap;
 }
 
+/* shatter type — the wordmark is cut into four slices per glyph so it can
+   break apart on hover. Sizes come from a hidden copy of the letter, so the
+   composition and the loop's clearance box stay exactly the same. */
+.shatter {
+  cursor: default;
+  pointer-events: auto;
+}
+
+.shatter-word,
+.shatter-char,
+.shatter-glyph {
+  display: inline-block;
+  position: relative;
+}
+
+.shatter-size {
+  visibility: hidden;
+}
+
+.shatter-piece {
+  position: absolute;
+  inset: 0;
+  display: block;
+  visibility: visible;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
 .wordmark::before {
   content: '';
   position: absolute;

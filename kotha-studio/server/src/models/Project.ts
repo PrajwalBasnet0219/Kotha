@@ -7,7 +7,7 @@ import {
   ROOM_TYPES,
 } from '@kotha/shared';
 
-const pointSchema = new Schema({ type: [Number], required: true }, { _id: false });
+const pointSchema = new Schema({ type: [Number] }, { _id: false });
 
 const spaceSchema = new Schema(
   {

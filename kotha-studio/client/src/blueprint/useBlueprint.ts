@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { uid } from '../lib/store';
-import { DEFAULT_WALL_THICKNESS } from './geometry';
+import { DEFAULT_FLOOR_COLOR, DEFAULT_WALL_COLOR, DEFAULT_WALL_THICKNESS } from './geometry';
 import type { BlueprintDoc, Floor, Room } from './types';
 
 const HISTORY_LIMIT = 60;
@@ -13,6 +13,8 @@ function blankFloor(index: number): Floor {
   return {
     id: uid('floor'),
     name: index === 0 ? 'Ground floor' : `${index}${index === 1 ? 'st' : index === 2 ? 'nd' : index === 3 ? 'rd' : 'th'} floor`,
+    wallColor: DEFAULT_WALL_COLOR,
+    floorColor: DEFAULT_FLOOR_COLOR,
     walls: [],
     openings: [],
     rooms: [],
@@ -42,6 +44,8 @@ function starterFloor(): Floor {
   return {
     id: uid('floor'),
     name: 'Ground floor',
+    wallColor: DEFAULT_WALL_COLOR,
+    floorColor: DEFAULT_FLOOR_COLOR,
     walls: [wall(room.points[0], room.points[1]), wall(room.points[1], room.points[2]), wall(room.points[2], room.points[3]), wall(room.points[3], room.points[0])],
     openings: [],
     rooms: [room],
@@ -68,7 +72,17 @@ function load(projectId: string, name: string): BlueprintDoc {
     if (!parsed || !Array.isArray(parsed.floors) || parsed.floors.length === 0) {
       return newDoc(projectId, name);
     }
-    return { ...newDoc(projectId, name), ...parsed, name: parsed.name || name };
+    return {
+      ...newDoc(projectId, name),
+      ...parsed,
+      name: parsed.name || name,
+      // Older saves predate finish colours; give every floor the defaults.
+      floors: parsed.floors.map((floor) => ({
+        ...floor,
+        wallColor: floor.wallColor ?? DEFAULT_WALL_COLOR,
+        floorColor: floor.floorColor ?? DEFAULT_FLOOR_COLOR,
+      })),
+    };
   } catch {
     return newDoc(projectId, name);
   }

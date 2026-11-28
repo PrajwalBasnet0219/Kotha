@@ -37,3 +37,9 @@ Thumbs.db
 # local scratch
 *.local.*
 Kotha_Studio_Project_Proposal (copy 1).docx
+
+# proposal / doc deliverables (kept locally, not tracked)
+*.pdf
+*.docx
+*.pptx
+*.txt

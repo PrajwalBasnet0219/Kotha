@@ -49,6 +49,9 @@ export type FurnitureItem = {
 export type Floor = {
   id: string;
   name: string;
+  /** Finish colours are chosen per floor and shared by its walls and rooms. */
+  wallColor?: string;
+  floorColor?: string;
   walls: Wall[];
   openings: Opening[];
   rooms: Room[];

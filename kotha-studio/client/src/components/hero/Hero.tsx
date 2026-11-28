@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { CraftText } from '../motion/CraftText';
+import { ShatterWord } from '../motion/ShatterWord';
 import { ORBIT } from './orbit';
 import { ScrollTrigger, clamp, easeOutCubic, reducedMotion } from '../../lib/motion';
 import { INTRO_EVENT, introWillPlay } from '../../lib/intro';
@@ -281,15 +281,7 @@ export function Hero() {
 
       <div className="hero__center" ref={centerRef}>
         <p className="hero__kicker mono">Kathmandu · interior planning</p>
-        <CraftText
-          as="h1"
-          text="Kotha"
-          className="wordmark"
-          on="load"
-          play={armed}
-          delay={0.15}
-          stagger={0.07}
-        />
+        <ShatterWord text="Kotha" className="wordmark" play={armed} delay={0.15} />
         <div className="wordmark__row">
           <span className="wordmark__rule" />
           <span className="wordmark__sub">Studio</span>

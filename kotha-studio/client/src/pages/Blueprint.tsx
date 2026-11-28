@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { useDb } from '../lib/store';
@@ -6,7 +6,9 @@ import { useBlueprint } from '../blueprint/useBlueprint';
 import { PlanCanvas, type Selection } from '../components/blueprint/PlanCanvas';
 import { Scene3D } from '../components/blueprint/Scene3D';
 import {
+  FLOOR_SWATCHES,
   MIN_WALL,
+  WALL_SWATCHES,
   estimate,
   m2,
   mm,
@@ -20,15 +22,15 @@ import { download, materialCsv, planSvg, printPlan, summaryRows } from '../bluep
 import type { FurnitureItem, Opening, Room, Tool, Wall } from '../blueprint/types';
 import '../styles/blueprint.css';
 
-const TOOLS: Array<{ id: Tool; label: string; key: string; glyph: string }> = [
-  { id: 'select', label: 'Select', key: 'V', glyph: '↖' },
-  { id: 'wall', label: 'Wall', key: 'W', glyph: '／' },
-  { id: 'room', label: 'Room', key: 'R', glyph: '▭' },
-  { id: 'stair', label: 'Stair', key: 'T', glyph: '▤' },
-  { id: 'door', label: 'Door', key: 'D', glyph: '⌐' },
-  { id: 'window', label: 'Window', key: 'N', glyph: '▥' },
-  { id: 'furniture', label: 'Furniture', key: 'F', glyph: '▣' },
-  { id: 'dimension', label: 'Dimension', key: 'M', glyph: '↔' },
+const TOOLS: Array<{ id: Tool; label: string; key: string; group: string; icon: string }> = [
+  { id: 'select', label: 'Select', key: 'V', group: 'Navigate', icon: 'M5 3l14 9-6 1-3 6z' },
+  { id: 'wall', label: 'Wall', key: 'W', group: 'Draw', icon: 'M3 20h18M4 20L20 4' },
+  { id: 'room', label: 'Room', key: 'R', group: 'Draw', icon: 'M4 5h16v14H4z' },
+  { id: 'stair', label: 'Stair', key: 'T', group: 'Draw', icon: 'M4 19h4v-4h4v-4h4V7h4' },
+  { id: 'door', label: 'Door', key: 'D', group: 'Openings', icon: 'M5 20V5h9v15M14 12h6' },
+  { id: 'window', label: 'Window', key: 'N', group: 'Openings', icon: 'M4 6h16v12H4zM12 6v12' },
+  { id: 'furniture', label: 'Furniture', key: 'F', group: 'Place', icon: 'M6 10V5h12v5M5 10h14v6H5zM7 16v3M17 16v3' },
+  { id: 'dimension', label: 'Dimension', key: 'M', group: 'Annotate', icon: 'M4 12h16M4 8v8M20 8v8' },
 ];
 
 type StatusTone = 'ok' | 'error' | 'info';
@@ -71,7 +73,14 @@ export function Blueprint() {
 
   const [tool, setTool] = useState<Tool>('select');
   const [selected, setSelected] = useState<Selection>(null);
+  const [highlight, setHighlight] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d');
+  const [autoRotate, setAutoRotate] = useState(false);
+  const [orbitCommand, setOrbitCommand] = useState<{ id: number; delta: number } | null>(null);
+  const [resetKey, setResetKey] = useState(0);
+
+  const orbit = (delta: number) =>
+    setOrbitCommand((current) => ({ id: (current?.id ?? 0) + 1, delta }));
   const [stackFloors, setStackFloors] = useState(true);
   const [status, setStatus] = useState<{ message: string; tone: StatusTone; id: number } | null>(null);
   const [layers, setLayers] = useState({
@@ -107,6 +116,7 @@ export function Blueprint() {
 
   useEffect(() => {
     setSelected(null);
+    setHighlight([]);
     setCalibration({ active: false, points: [], real: '' });
   }, [activeFloorId]);
 
@@ -170,6 +180,23 @@ export function Blueprint() {
   const rows = summaryRows(doc, floor);
 
   const deleteSelected = () => {
+    // A marquee can hold several objects; delete all of them in one step.
+    if (highlight.length > 1) {
+      const ids = new Set(highlight);
+      updateFloor((current) => ({
+        ...current,
+        walls: current.walls.filter((wall) => !ids.has(wall.id)),
+        openings: current.openings.filter(
+          (opening) => !ids.has(opening.id) && !ids.has(opening.wallId),
+        ),
+        furniture: current.furniture.filter((item) => !ids.has(item.id)),
+        rooms: current.rooms.filter((room) => !ids.has(room.id)),
+      }));
+      notify(`${ids.size} objects removed.`, 'ok');
+      setHighlight([]);
+      setSelected(null);
+      return;
+    }
     if (!selected) return;
     if (selected.kind === 'wall') {
       updateFloor((current) => ({
@@ -473,26 +500,30 @@ export function Blueprint() {
         <aside className="bp-rail">
           <p className="mono bp-rail__title">Tools</p>
           <div className="bp-tools">
-            {TOOLS.map((entry) => (
-              <button
-                key={entry.id}
-                type="button"
-                className={`bp-tool ${tool === entry.id || (entry.id === 'dimension' && layers.dimensions) ? 'is-active' : ''}`}
-                onClick={() => {
-                  if (entry.id === 'dimension') {
-                    setLayers((current) => ({ ...current, dimensions: !current.dimensions }));
-                  } else {
-                    setTool(entry.id);
-                  }
-                }}
-                title={`${entry.label} (${entry.key})`}
-              >
-                <span className="bp-tool__glyph" aria-hidden="true">
-                  {entry.glyph}
-                </span>
-                <span className="bp-tool__label">{entry.label}</span>
-                <span className="bp-tool__key mono">{entry.key}</span>
-              </button>
+            {TOOLS.map((entry, index) => (
+              <Fragment key={entry.id}>
+                {index === 0 || TOOLS[index - 1].group !== entry.group ? (
+                  <p className="bp-tools__group mono">{entry.group}</p>
+                ) : null}
+                <button
+                  type="button"
+                  className={`bp-tool ${tool === entry.id || (entry.id === 'dimension' && layers.dimensions) ? 'is-active' : ''}`}
+                  onClick={() => {
+                    if (entry.id === 'dimension') {
+                      setLayers((current) => ({ ...current, dimensions: !current.dimensions }));
+                    } else {
+                      setTool(entry.id);
+                    }
+                  }}
+                  title={`${entry.label} (${entry.key})`}
+                >
+                  <svg className="bp-tool__glyph" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d={entry.icon} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  <span className="bp-tool__label">{entry.label}</span>
+                  <span className="bp-tool__key mono">{entry.key}</span>
+                </button>
+              </Fragment>
             ))}
           </div>
 
@@ -574,9 +605,12 @@ export function Blueprint() {
 
         <main className="bp-stage">
           <div className="bp-stage__bar">
-            <span className="mono">
+            <span className="bp-mode mono">
+              {TOOLS.find((entry) => entry.id === tool)?.label ?? 'Select'}
+            </span>
+            <span className="bp-stage__hint mono">
               {tool === 'select'
-                ? 'Select · drag a piece to move it · drag an opening to slide it'
+                ? 'Select · click an object, drag to move it, or drag empty space to highlight an area'
                 : tool === 'wall'
                   ? 'Wall · click points · click the first point to close a room'
                   : tool === 'room' || tool === 'stair'
@@ -594,6 +628,23 @@ export function Blueprint() {
                 Calibrate · click two points ({calibration.points.length}/2)
               </span>
             ) : null}
+            <details className="bp-help">
+              <summary className="mono" aria-label="Keyboard shortcuts">?</summary>
+              <div className="bp-help__panel">
+                <p className="mono">Shortcuts</p>
+                <ul>
+                  <li><kbd>V</kbd> Select · drag objects, marquee an area</li>
+                  <li><kbd>W</kbd> Wall · click points, close on the first</li>
+                  <li><kbd>R</kbd> Room · drag a rectangle</li>
+                  <li><kbd>T</kbd> Stair · drag a stair void</li>
+                  <li><kbd>D</kbd> / <kbd>N</kbd> Door / window</li>
+                  <li><kbd>F</kbd> Furniture · place from catalogue</li>
+                  <li><kbd>M</kbd> Dimensions on / off</li>
+                  <li><kbd>Space</kbd> + drag to pan · wheel to zoom</li>
+                  <li><kbd>Ctrl</kbd> <kbd>Z</kbd> Undo · <kbd>Del</kbd> Delete</li>
+                </ul>
+              </div>
+            </details>
           </div>
 
           {viewMode === '2d' ? (
@@ -606,10 +657,13 @@ export function Blueprint() {
               background={background}
               calibrationPoints={calibration.points}
               calibrationActive={calibration.active}
+              highlight={highlight}
               onSelect={setSelected}
+              onHighlight={setHighlight}
               onChange={updateFloor}
               onStatus={notify}
               onCalibrationPick={onCalibrationPick}
+              onRequestTool={setTool}
             />
           ) : (
             <div className="bp-scene">
@@ -625,6 +679,44 @@ export function Blueprint() {
                 </div>
               ) : (
                 <>
+                  <div className="bp-scene__orbit" role="group" aria-label="3D camera">
+                    <button
+                      type="button"
+                      className="bp-scene__orbit-btn mono"
+                      onClick={() => orbit(-30)}
+                      title="Turn 30° left"
+                    >
+                      ↺
+                    </button>
+                    <button
+                      type="button"
+                      className={`bp-scene__orbit-btn mono ${autoRotate ? 'is-active' : ''}`}
+                      onClick={() => setAutoRotate((value) => !value)}
+                      title="Slowly spin the whole room"
+                      aria-pressed={autoRotate}
+                    >
+                      {autoRotate ? 'Stop spin' : 'Auto spin'}
+                    </button>
+                    <button
+                      type="button"
+                      className="bp-scene__orbit-btn mono"
+                      onClick={() => orbit(30)}
+                      title="Turn 30° right"
+                    >
+                      ↻
+                    </button>
+                    <button
+                      type="button"
+                      className="bp-scene__orbit-btn mono"
+                      onClick={() => {
+                        setAutoRotate(false);
+                        setResetKey((value) => value + 1);
+                      }}
+                      title="Return to the opening view"
+                    >
+                      Reset view
+                    </button>
+                  </div>
                   {doc.floors.length > 1 ? (
                     <label className="bp-scene__toggle mono">
                       <input
@@ -644,6 +736,9 @@ export function Blueprint() {
                     onSelect={(kind, id) => setSelected({ kind, id })}
                     onMoveFurniture={moveFurniture3D}
                     onMoveOpening={moveOpening3D}
+                    autoRotate={autoRotate}
+                    orbitCommand={orbitCommand}
+                    resetKey={resetKey}
                   />
                   <p className="bp-scene__hint mono">
                     Orbit: drag · Zoom: wheel · Move furniture: drag · Select a door handle to edit it in the panel
@@ -765,6 +860,25 @@ export function Blueprint() {
                 </div>
 
                 <div className="bp-form__block">
+                  <p className="mono bp-form__label">Finishes</p>
+                  <ColorChoice
+                    label="Wall colour"
+                    value={floor.wallColor ?? '#e8e4da'}
+                    swatches={WALL_SWATCHES}
+                    onChange={(wallColor) => updateFloor((current) => ({ ...current, wallColor }))}
+                  />
+                  <ColorChoice
+                    label="Floor colour"
+                    value={floor.floorColor ?? '#d9d4c9'}
+                    swatches={FLOOR_SWATCHES}
+                    onChange={(floorColor) => updateFloor((current) => ({ ...current, floorColor }))}
+                  />
+                  <p className="bp-note mono">
+                    Applies to this floor in both the plan and the 3D preview.
+                  </p>
+                </div>
+
+                <div className="bp-form__block">
                   <p className="mono bp-form__label">Floor data</p>
                   <button type="button" className="bp-btn bp-btn--wide" onClick={() => {
                     if (window.confirm('Clear walls, rooms, openings and furniture on this floor?')) clearFloor();
@@ -792,6 +906,41 @@ export function Blueprint() {
           {status.message}
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function ColorChoice({
+  label,
+  value,
+  swatches,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  swatches: string[];
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="bp-colour">
+      <span className="mono">{label}</span>
+      <div className="bp-colour__row">
+        {swatches.map((swatch) => (
+          <button
+            key={swatch}
+            type="button"
+            className={`bp-colour__chip ${value.toLowerCase() === swatch.toLowerCase() ? 'is-active' : ''}`}
+            style={{ background: swatch }}
+            title={swatch}
+            aria-label={`${label} ${swatch}`}
+            onClick={() => onChange(swatch)}
+          />
+        ))}
+        <label className="bp-colour__custom" title="Choose a custom colour">
+          <input type="color" value={value} onChange={(event) => onChange(event.target.value)} />
+          <span aria-hidden="true">＋</span>
+        </label>
+      </div>
     </div>
   );
 }
